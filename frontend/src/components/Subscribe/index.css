@@ -1,0 +1,102 @@
+/* Subscribe.css */
+.subscribe-page {
+  padding: 3rem 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeIn 0.8s ease;
+}
+
+.plans-container {
+  text-align: center;
+}
+
+.plans-title {
+  color: #FFD700;
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.plan-card {
+  background: rgba(26, 26, 26, 0.9);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.plan-card:hover {
+  border-color: #FFD700;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(255, 215, 0, 0.15);
+}
+
+.plan-card.featured {
+  border-color: #FFD700;
+  transform: scale(1.02);
+}
+
+.plan-name {
+  color: #FFD700;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.plan-features {
+  list-style: none;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.plan-features li {
+  color: #ccc;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.plan-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #FFD700;
+  font-weight: bold;
+}
+
+.plan-price {
+  color: #FFD700;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 1.5rem 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .plan-card.featured {
+    transform: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .plans-title {
+    font-size: 1.8rem;
+  }
+}
