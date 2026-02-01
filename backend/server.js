@@ -15,7 +15,7 @@ app.use(express.json())
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://vidora-stream-6789.onrender.com"
+    "https://vidora-frontend-0oxe.onrender.com"
   ],
   credentials: true
 }))
