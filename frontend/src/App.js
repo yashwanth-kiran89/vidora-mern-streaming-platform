@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Cookies from 'js-cookie';
+
 
 // Components
 import Login from './components/Login';
@@ -21,11 +21,9 @@ const App = () => {
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/about" component={About} />
-        
         <ProtectedRoute exact path="/" component={Home} />
         <ProtectedRoute exact path="/subscribe" component={Subscribe} />
         <ProtectedRoute exact path="/movie/:id" component={MovieDetails} />
-        
         <Route path="/not-found" component={NotFound} />
         <Redirect to="/not-found" />
       </Switch>

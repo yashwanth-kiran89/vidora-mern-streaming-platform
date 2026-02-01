@@ -1,91 +1,321 @@
-/* Navbar.css */
+/* Netflix-Style Header */
 .navbar {
-  background: rgba(10, 10, 10, 0.98);
-  padding: 1rem 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 0 4%;
+  height: 68px;
+  z-index: 1000;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+  transition: all 0.4s cubic-bezier(0.5, 0, 0.1, 1);
+}
+
+.navbar-scrolled {
+  background: #141414;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+  height: 60px;
+}
+
+.navbar-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-  backdrop-filter: blur(10px);
+  width: 100%;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
 
 .navbar-brand {
-  color: #FFD700;
-  font-size: 1.8rem;
-  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+}
+
+.brand-text {
   font-family: 'Poppins', sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #FFD700, #ff6b00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
 }
 
-.navbar-brand span {
-  font-size: 1.3rem;
+.brand-subtitle {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 3px;
+  margin-top: -3px;
 }
 
-.navbar-links {
+.navbar-main-links {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  gap: 20px;
 }
 
 .nav-link {
-  color: #e0e0e0;
+  color: #e5e5e5;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 14px;
   font-weight: 500;
-  padding: 0.5rem 0;
-  position: relative;
   transition: color 0.3s ease;
+  position: relative;
+  padding: 5px 0;
 }
 
 .nav-link:hover {
-  color: #FFD700;
+  color: #fff;
 }
 
-.nav-link.active {
-  color: #FFD700;
-}
-
-.nav-link.active::after {
+.nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: 0;
   height: 2px;
   background: #FFD700;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.navbar-search {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.navbar-search:hover {
+  transform: scale(1.1);
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+  opacity: 0.8;
+}
+
+.search-icon:hover {
+  opacity: 1;
+}
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.auth-link {
+  font-size: 13px;
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #FFD700 0%, #ffb700 100%);
+  color: #000;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-register:hover {
+  background: linear-gradient(135deg, #ffc700 0%, #FFD700 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.4rem 1rem;
-  background: rgba(255, 215, 0, 0.08);
-  border-radius: 50px;
-  border: 1px solid rgba(255, 215, 0, 0.1);
+  gap: 15px;
 }
 
 .username {
-  color: #FFD700;
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
   font-weight: 500;
 }
 
+.btn-logout {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #FFD700;
+  color: #FFD700;
+}
+
+.logout-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hamburger-line {
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.hamburger-line.active:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-line.active:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-line.active:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  padding: 20px;
+  flex-direction: column;
+  gap: 15px;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.mobile-menu.show {
+  display: flex;
+}
+
+.mobile-nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  color: #FFD700;
+}
+
+.mobile-nav-link.logout {
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 12px 0;
+}
+
+/* Gradient Overlay */
+.navbar-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .navbar {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    padding: 0 3%;
   }
   
-  .navbar-links {
-    gap: 1rem;
+  .navbar-main-links {
+    display: none;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 20px;
+  }
+  
+  .navbar-auth {
+    display: none;
+  }
+  
+  .navbar-search {
+    display: none;
+  }
+  
+  .brand-text {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    height: 60px;
+  }
+  
+  .navbar-scrolled {
+    height: 56px;
+  }
+  
+  .brand-text {
+    font-size: 20px;
   }
 }
