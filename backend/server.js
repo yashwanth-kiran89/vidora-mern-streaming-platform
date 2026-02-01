@@ -2,19 +2,24 @@ const express = require('express')
 const {open} = require('sqlite')
 const sqlite3 = require('sqlite3')
 const path = require('path')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
+
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
 
-const databasePath = path.join(__dirname, 'movies.db')
+const databasePath = path.join(__dirname, 'db', 'movies.db')
 
 const app = express()
 
 app.use(express.json())
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: [
+    "http://localhost:3000",
+    "https://vidora-stream-6789.onrender.com"
+  ],
   credentials: true
 }))
+
 
 let database = null
 
@@ -25,8 +30,10 @@ const initializeDbAndServer = async () => {
       driver: sqlite3.Database,
     })
 
-    app.listen(5000, () =>
-      console.log('Server Running at http://localhost:5000/'),
+    const PORT = process.env.PORT || 5000
+
+    app.listen(PORT, () =>
+      console.log(`Server Running at port ${PORT}`),
     )
   } catch (error) {
     console.log(`DB Error: ${error.message}`)
