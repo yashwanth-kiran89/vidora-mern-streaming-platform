@@ -3,7 +3,8 @@ import { Redirect, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import Popup from 'reactjs-popup';
 import ReactPlayer from 'react-player';
-import Header from '../Header';
+import Header from '../Header'; 
+import { API_URL } from "../../config.js"
 import './index.css';
 
 // Import slick CSS for similar movies carousel
@@ -39,7 +40,7 @@ class MovieDetails extends Component {
   fetchMovie = async () => {
     const { id } = this.props.match.params;
     const jwtToken = Cookies.get('jwt_token');
-    const url = `http://localhost:5000/api/movies/${id}`;
+    const url = `${API_URL}/api/movies/${id}`;
     const options = {
       method: 'GET',
       headers: {

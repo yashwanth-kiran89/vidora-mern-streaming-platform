@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie'; 
+import { API_URL } from "../../config.js"
 import './index.css';
 
 class Login extends Component {
@@ -46,7 +47,7 @@ class Login extends Component {
     const { email, password } = this.state;
     
     const userDetails = { email, password };
-    const url = 'http://localhost:5000/api/login';
+    const url = `${API_URL}/api/login`;
     const options = {
       method: 'POST',
       headers: {

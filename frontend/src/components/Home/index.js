@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import Slider from 'react-slick';
 import Popup from 'reactjs-popup';
 import ReactPlayer from 'react-player';
+import { API_URL } from "../../config.js"
 import Header from '../Header';
 import './index.css';
 
@@ -39,7 +40,7 @@ class Home extends Component {
   }
 
   fetchMovies = async () => {
-    const url = 'http://localhost:5000/api/movies';
+    const url = `${API_URL}/api/movies`;
     const options = {
       method: 'GET',
     };

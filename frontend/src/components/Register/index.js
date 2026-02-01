@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie'; 
+import { API_URL } from "../../config.js"
 import './index.css';
 
 class Register extends Component {
@@ -100,7 +101,7 @@ class Register extends Component {
     const { username, email, password } = this.state;
     
     const userDetails = { username, email, password };
-    const url = 'http://localhost:5000/api/register';
+    const url =  `${API_URL}/api/register`;
     const options = {
       method: 'POST',
       headers: {
