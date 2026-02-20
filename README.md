@@ -49,9 +49,4 @@ VidoraMERN/
     │   └── index.css
     ├── package.json
     └── README.md
-📡 API Endpoints (Backend)
-Method	Endpoint	Description	Auth Required
-POST	/api/register	Register a new user	No
-POST	/api/login	Login and receive JWT	No
-GET	/api/movies	Get all movies	Yes
-GET	/api/movies/:id	Get a single movie by ID	Yes
+
