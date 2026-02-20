@@ -1,14 +1,12 @@
 const express = require('express')
-const {open} = require('sqlite')
+const { open } = require('sqlite')
 const sqlite3 = require('sqlite3')
 const path = require('path')
 const bcrypt = require('bcryptjs')
-
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
 
 const databasePath = path.join(__dirname, 'db', 'movies.db')
-
 const app = express()
 
 app.use(express.json())
@@ -20,212 +18,223 @@ app.use(cors({
   credentials: true
 }))
 
-
 let database = null
 
+// Initialize database connection and start server
 const initializeDbAndServer = async () => {
   try {
     database = await open({
       filename: databasePath,
       driver: sqlite3.Database,
     })
-
     const PORT = process.env.PORT || 5000
-
-    app.listen(PORT, () =>
-      console.log(`Server Running at port ${PORT}`),
-    )
+    app.listen(PORT, () => console.log(`Server Running at port ${PORT}`))
   } catch (error) {
     console.log(`DB Error: ${error.message}`)
     process.exit(1)
   }
 }
-
 initializeDbAndServer()
 
-// Authentication middleware
+// -------------------- Authentication Middleware --------------------
 const authenticateToken = (request, response, next) => {
-  let jwtToken
   const authHeader = request.headers['authorization']
-  if (authHeader !== undefined) {
-    jwtToken = authHeader.split(' ')[1]
+  const jwtToken = authHeader && authHeader.split(' ')[1]
+  if (!jwtToken) {
+    return response.status(401).send('Invalid JWT Token')
   }
-  if (jwtToken === undefined) {
-    response.status(401)
-    response.send('Invalid JWT Token')
-  } else {
-    jwt.verify(jwtToken, 'vidora-secret-key-2024', async (error, payload) => {
-      if (error) {
-        response.status(401)
-        response.send('Invalid JWT Token')
-      } else {
-        request.username = payload.username
-        next()
-      }
-    })
-  }
+  jwt.verify(jwtToken, 'vidora-secret-key-2024', (error, payload) => {
+    if (error) {
+      return response.status(401).send('Invalid JWT Token')
+    }
+    request.username = payload.username
+    next()
+  })
 }
 
-// Register user
+// -------------------- Public Endpoints (No Auth Required) --------------------
+
+// User Registration
 app.post('/api/register', async (request, response) => {
-  const {username, email, password} = request.body
+  const { username, email, password } = request.body
   const hashedPassword = await bcrypt.hash(password, 10)
-  
-  const selectUserQuery = `SELECT * FROM users WHERE username = '${username}' OR email = '${email}';`
-  const databaseUser = await database.get(selectUserQuery)
-  
-  if (databaseUser === undefined) {
-    const createUserQuery = `
-      INSERT INTO users (username, email, password) 
-      VALUES ('${username}', '${email}', '${hashedPassword}');`
-    await database.run(createUserQuery)
-    
-    const payload = {username: username}
-    const jwtToken = jwt.sign(payload, 'vidora-secret-key-2024')
-    response.send({jwtToken, user: {username, email}})
-  } else {
-    response.status(400)
-    response.send('User already exists')
+
+  // Check if user already exists
+  const selectUserQuery = `SELECT * FROM users WHERE username = ? OR email = ?`
+  const existingUser = await database.get(selectUserQuery, [username, email])
+  if (existingUser) {
+    return response.status(400).send('User already exists')
   }
+
+  // Create new user
+  const insertUserQuery = `
+    INSERT INTO users (username, email, password)
+    VALUES (?, ?, ?)
+  `
+  await database.run(insertUserQuery, [username, email, hashedPassword])
+
+  // Generate JWT token
+  const payload = { username }
+  const jwtToken = jwt.sign(payload, 'vidora-secret-key-2024')
+  response.send({ jwtToken, user: { username, email } })
 })
 
-// Login user
+// User Login
 app.post('/api/login', async (request, response) => {
-  const {email, password} = request.body
-  const selectUserQuery = `SELECT * FROM users WHERE email = '${email}';`
-  const databaseUser = await database.get(selectUserQuery)
-  
-  if (databaseUser === undefined) {
-    response.status(400)
-    response.send('Invalid user')
-  } else {
-    const isPasswordMatched = await bcrypt.compare(password, databaseUser.password)
-    if (isPasswordMatched === true) {
-      const payload = {username: databaseUser.username, email: databaseUser.email}
-      const jwtToken = jwt.sign(payload, 'vidora-secret-key-2024')
-      response.send({jwtToken, user: {username: databaseUser.username, email: databaseUser.email}})
-    } else {
-      response.status(400)
-      response.send('Invalid password')
-    }
+  const { email, password } = request.body
+  const selectUserQuery = `SELECT * FROM users WHERE email = ?`
+  const user = await database.get(selectUserQuery, [email])
+
+  if (!user) {
+    return response.status(400).send('Invalid user')
   }
+
+  const isPasswordMatched = await bcrypt.compare(password, user.password)
+  if (!isPasswordMatched) {
+    return response.status(400).send('Invalid password')
+  }
+
+  const payload = { username: user.username, email: user.email }
+  const jwtToken = jwt.sign(payload, 'vidora-secret-key-2024')
+  response.send({ jwtToken, user: { username: user.username, email: user.email } })
 })
 
-// Get current user
+// Get current user (protected)
 app.get('/api/me', authenticateToken, async (request, response) => {
-  const selectUserQuery = `SELECT username, email FROM users WHERE username = '${request.username}';`
-  const databaseUser = await database.get(selectUserQuery)
-  response.send({user: databaseUser})
+  const selectUserQuery = `SELECT username, email FROM users WHERE username = ?`
+  const user = await database.get(selectUserQuery, [request.username])
+  response.send({ user })
 })
 
-// Logout
+// Logout (just a placeholder)
 app.post('/api/logout', (request, response) => {
-  response.send({message: 'Logged out successfully'})
+  response.send({ message: 'Logged out successfully' })
 })
 
-// Get all movies
+// -------------------- Movies Endpoints (Public for now) --------------------
+// (You can later protect them by adding authenticateToken middleware)
+
+// GET /api/movies?search=&genre=&language=
+// Returns movies filtered by search term, genre, and language (all optional)
 app.get('/api/movies', async (request, response) => {
-  const getMoviesQuery = `SELECT * FROM movies ORDER BY id;`
-  const moviesArray = await database.all(getMoviesQuery)
-  const formattedMovies = moviesArray.map(movie => ({
-    id: movie.id,
-    name: movie.name,
-    image: movie.image,
-    year: movie.year,
-    genres: movie.genres ? movie.genres.split(',') : [],
-    embed: movie.embed,
-    director: movie.director,
-    cast: movie.cast ? movie.cast.split(',') : [],
-    synopsis: movie.synopsis,
-    language: movie.language
-  }))
-  response.send(formattedMovies)
-})
+  const { search, genre, language } = request.query;
+  let sql = 'SELECT * FROM movies WHERE 1=1';
+  const params = [];
 
-// Get movie by ID
-app.get('/api/movies/:id', async (request, response) => {
-  const {id} = request.params
-  const getMovieQuery = `SELECT * FROM movies WHERE id = ${id};`
-  const movie = await database.get(getMovieQuery)
-  
-  if (movie === undefined) {
-    response.status(404)
-    response.send('Movie not found')
-  } else {
-    const formattedMovie = {
-      id: movie.id,
-      name: movie.name,
-      image: movie.image,
-      year: movie.year,
-      genres: movie.genres ? movie.genres.split(',') : [],
-      embed: movie.embed,
-      director: movie.director,
-      cast: movie.cast ? movie.cast.split(',') : [],
-      synopsis: movie.synopsis,
-      language: movie.language
-    }
-    response.send(formattedMovie)
+  // Search by name, director, or cast – note the double quotes around "cast"
+  if (search && search.trim() !== '') {
+    const trimmed = search.trim();
+    sql += ` AND (name LIKE ? OR director LIKE ? OR "cast" LIKE ?)`;
+    const pattern = `%${trimmed}%`;
+    params.push(pattern, pattern, pattern);
   }
+
+  // Filter by genre
+  if (genre) {
+    sql += ` AND genres LIKE ?`;
+    params.push(`%${genre}%`);
+  }
+
+  // Filter by language
+  if (language) {
+    sql += ` AND language = ?`;
+    params.push(language);
+  }
+
+  sql += ' ORDER BY id';
+
+  try {
+    const movies = await database.all(sql, params);
+    const formatted = movies.map(m => ({
+      ...m,
+      genres: m.genres ? m.genres.split(',') : [],
+      cast: m.cast ? m.cast.split(',') : []
+    }));
+    response.send(formatted);
+  } catch (error) {
+    console.error('Database error:', error.message);
+    response.status(500).send({ error: error.message });
+  }
+});
+
+// GET /api/movies/:id – Get a single movie by ID
+app.get('/api/movies/:id', async (request, response) => {
+  const { id } = request.params
+  const sql = 'SELECT * FROM movies WHERE id = ?'
+  const movie = await database.get(sql, [id])
+
+  if (!movie) {
+    return response.status(404).send('Movie not found')
+  }
+
+  const formatted = {
+    ...movie,
+    genres: movie.genres ? movie.genres.split(',') : [],
+    cast: movie.cast ? movie.cast.split(',') : []
+  }
+  response.send(formatted)
 })
 
-// Protected routes for movie management
+// GET /api/trending – Returns top 10 trending movies (from trending table)
+app.get('/api/trending', async (request, response) => {
+  const sql = `
+    SELECT m.* FROM movies m
+    JOIN trending t ON m.id = t.movie_id
+    ORDER BY t.rank
+  `
+  const movies = await database.all(sql)
+  const formatted = movies.map(m => ({
+    ...m,
+    genres: m.genres ? m.genres.split(',') : [],
+    cast: m.cast ? m.cast.split(',') : []
+  }))
+  response.send(formatted)
+})
+
+// -------------------- Protected Admin Endpoints (require token) --------------------
+// These are for adding/updating/deleting movies – only accessible with a valid token.
+
+// POST /api/movies – Add a new movie
 app.post('/api/movies', authenticateToken, async (request, response) => {
-  const {name, image, year, genres, embed, director, cast, synopsis, language} = request.body
-  const postMovieQuery = `
-    INSERT INTO movies (name, image, year, genres, embed, director, cast, synopsis, language)
-    VALUES ('${name}', '${image}', ${year}, '${genres.join(',')}', '${embed}', '${director}', '${cast.join(',')}', '${synopsis}', '${language}');`
-  await database.run(postMovieQuery)
+  const { name, image, year, genres, embed, director, cast, synopsis, language, rating } = request.body
+  const sql = `
+    INSERT INTO movies (name, image, year, genres, embed, director, cast, synopsis, language, rating)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `
+  const params = [
+    name, image, year,
+    genres.join(','), embed, director,
+    cast.join(','), synopsis, language, rating
+  ]
+  await database.run(sql, params)
   response.send('Movie Successfully Added')
 })
 
+// PUT /api/movies/:id – Update an existing movie
 app.put('/api/movies/:id', authenticateToken, async (request, response) => {
-  const {id} = request.params
-  const {name, image, year, genres, embed, director, cast, synopsis, language} = request.body
-  const updateMovieQuery = `
+  const { id } = request.params
+  const { name, image, year, genres, embed, director, cast, synopsis, language, rating } = request.body
+  const sql = `
     UPDATE movies
-    SET 
-      name = '${name}',
-      image = '${image}',
-      year = ${year},
-      genres = '${genres.join(',')}',
-      embed = '${embed}',
-      director = '${director}',
-      cast = '${cast.join(',')}',
-      synopsis = '${synopsis}',
-      language = '${language}'
-    WHERE id = ${id};`
-  await database.run(updateMovieQuery)
+    SET name = ?, image = ?, year = ?, genres = ?, embed = ?, director = ?, cast = ?, synopsis = ?, language = ?, rating = ?
+    WHERE id = ?
+  `
+  const params = [
+    name, image, year,
+    genres.join(','), embed, director,
+    cast.join(','), synopsis, language, rating,
+    id
+  ]
+  await database.run(sql, params)
   response.send('Movie Details Updated')
 })
 
+// DELETE /api/movies/:id – Remove a movie
 app.delete('/api/movies/:id', authenticateToken, async (request, response) => {
-  const {id} = request.params
-  const deleteMovieQuery = `DELETE FROM movies WHERE id = ${id};`
-  await database.run(deleteMovieQuery)
+  const { id } = request.params
+  const sql = 'DELETE FROM movies WHERE id = ?'
+  await database.run(sql, [id])
   response.send('Movie Removed')
-})
-
-// Search movies
-app.get('/api/movies/search/:query', async (request, response) => {
-  const {query} = request.params
-  const searchQuery = `%${query}%`
-  const getMoviesQuery = `
-    SELECT * FROM movies 
-    WHERE name LIKE '${searchQuery}' OR director LIKE '${searchQuery}' OR cast LIKE '${searchQuery}';`
-  const moviesArray = await database.all(getMoviesQuery)
-  const formattedMovies = moviesArray.map(movie => ({
-    id: movie.id,
-    name: movie.name,
-    image: movie.image,
-    year: movie.year,
-    genres: movie.genres ? movie.genres.split(',') : [],
-    embed: movie.embed,
-    director: movie.director,
-    cast: movie.cast ? movie.cast.split(',') : [],
-    synopsis: movie.synopsis,
-    language: movie.language
-  }))
-  response.send(formattedMovies)
 })
 
 module.exports = app

@@ -11,6 +11,8 @@ import About from './components/About';
 import Subscribe from './components/Subscribe';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import SearchResults from './components/SearchResults';
+
 
 import './App.css';
 
@@ -23,7 +25,8 @@ const App = () => {
         <Route exact path="/about" component={About} />
         <ProtectedRoute exact path="/" component={Home} />
         <ProtectedRoute exact path="/subscribe" component={Subscribe} />
-        <ProtectedRoute exact path="/movie/:id" component={MovieDetails} />
+        <ProtectedRoute exact path="/movie/:id" component={MovieDetails} /> 
+        <ProtectedRoute path="/search" component={SearchResults} />
         <Route path="/not-found" component={NotFound} />
         <Redirect to="/not-found" />
       </Switch>

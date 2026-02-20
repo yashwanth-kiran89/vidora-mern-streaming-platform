@@ -1,0 +1,204 @@
+/* Movie Card Styles */
+.movie-card {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.5, 0, 0.1, 1);
+  cursor: pointer;
+  background: #1a1a1a;
+  height: 100%;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.movie-card-large:hover {
+  transform: scale(1.08);
+}
+
+.movie-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.movie-card-image-container {
+  position: relative;
+  padding-top: 150%;
+  overflow: hidden;
+}
+
+.movie-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.movie-card-image.hovered {
+  transform: scale(1.1);
+}
+
+.movie-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.movie-card:hover .movie-card-overlay {
+  opacity: 1;
+}
+
+.movie-card-hover-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  opacity: 0;
+}
+
+.movie-card:hover .movie-card-hover-info {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.hover-info-content {
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.hover-movie-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-movie-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hover-year,
+.hover-language,
+.hover-rating {
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.hover-rating {
+  color: #FFD700;
+}
+
+.hover-genres {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.hover-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hover-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.play-btn {
+  background: #FFD700;
+  color: #000;
+  flex: 1;
+}
+
+.play-btn:hover {
+  background: #ffc700;
+}
+
+.info-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 6px;
+}
+
+.info-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hover-action-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.movie-card-info {
+  padding: 15px 10px 10px;
+}
+
+.movie-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.movie-card-year {
+  font-weight: 500;
+}
+
+.movie-card-rating {
+  color: #FFD700;
+}

@@ -10,7 +10,7 @@ const initializeDatabase = async () => {
       driver: sqlite3.Database,
     });
 
-    // Create movies table
+    // Create movies table with rating
     await database.run(`CREATE TABLE IF NOT EXISTS movies (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
@@ -21,7 +21,8 @@ const initializeDatabase = async () => {
       director TEXT,
       cast TEXT,
       synopsis TEXT,
-      language TEXT
+      language TEXT,
+      rating REAL
     )`);
 
     // Create users table
@@ -33,9 +34,15 @@ const initializeDatabase = async () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
+    // Create trending table
+    await database.run(`CREATE TABLE IF NOT EXISTS trending (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      movie_id INTEGER UNIQUE,
+      rank INTEGER,
+      FOREIGN KEY(movie_id) REFERENCES movies(id) ON DELETE CASCADE
+    )`);
+
     console.log("Database tables created successfully!");
-    
-    // Close the database connection
     await database.close();
   } catch (error) {
     console.log(`DB Error: ${error.message}`);
